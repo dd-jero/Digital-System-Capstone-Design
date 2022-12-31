@@ -1,3 +1,5 @@
+// Verilogë¥¼ ì´ìš©í•œ CNNì˜ Single Layer ì œì‘ 
+
 `timescale 1ns / 1ps
 
 module CNN_Single_Layer(
@@ -23,33 +25,33 @@ clk, rst_n, Start, Image, Filter, ReadEn, ConvResult
     wire [7:0] ReadData1, ReadData2, ReadData3;
 
     
-    // °ö¼À °è»ê, Ãâ·Â bit¼ö À¯ÀÇ
+    // ê³±ì…ˆ ê³„ì‚°, ì¶œë ¥ bitìˆ˜ ìœ ì˜
     // MultValue = Image * Filter
-    Multiplicator Multiplicator (.Start(Start), .din0(Image), .din1(Filter), .dout(MultValue));   // °ö¼À °á°ú = Partial Sum (PSum)
+    Multiplicator Multiplicator (.Start(Start), .din0(Image), .din1(Filter), .dout(MultValue));   // ê³±ì…ˆ ê²°ê³¼ = Partial Sum (PSum)
    
-   // Register File Read/Write ÁÖ¼Ò °è»ê 
+   // Register File Read/Write ì£¼ì†Œ ê³„ì‚° 
    /*
-    1. WriteReg : 0, 1, 2, ..., 14¸¦ Ãâ·Â
-    2. ReadReg1 : 0, 3, 6, 9, 12, 0, 3, ...À» Ãâ·Â
-    3. ReadReg2 : 1, 4, 7, 10, 13, 1, 4, ...À» Ãâ·Â
-    4. ReadReg3 : 2, 5, 8, 11, 14, 2, 5, ...À» Ãâ·Â
+    1. WriteReg : 0, 1, 2, ..., 14ë¥¼ ì¶œë ¥
+    2. ReadReg1 : 0, 3, 6, 9, 12, 0, 3, ...ì„ ì¶œë ¥
+    3. ReadReg2 : 1, 4, 7, 10, 13, 1, 4, ...ì„ ì¶œë ¥
+    4. ReadReg3 : 2, 5, 8, 11, 14, 2, 5, ...ì„ ì¶œë ¥
    */
      AddressCounter AddressCounter (.clk(clk), .rst_n(rst_n), .Start(Start), .WriteReg(WriteReg), .ReadEn(ReadEn),
         .ReadReg1(ReadReg1), .ReadReg2(ReadReg2), .ReadReg3(ReadReg3));
     
-    // ÄÁº¼·ç¼Ç ¿¬»ê Áß °è»êµÈ Partial SumµéÀ» ÀúÀåÇÏ±â À§ÇÑ Register File
+    // convolution ì—°ì‚° ì¤‘ ê³„ì‚°ëœ Partial Sumë“¤ì„ ì €ì¥í•˜ê¸° ìœ„í•œ Register File
     /*
-    1.  Register File ¾²±â (Write) µ¿ÀÛ     
-        1) WriteReg : Partial SumÀ» Register File¿¡ ÀúÀåÇÒ ¶§ ÁÖ¼Ò°ª 
-        2) MultValue : Partial SumÀ» Register File¿¡ ÀúÀåÇÒ ¶§ ÀúÀåÇÒ °ª
-        3) Start : Start = 1ÀÏ ¶§¸¸ Register File¿¡ µ¥ÀÌÅÍ ÀúÀå
+    1.  Register File ì“°ê¸° (Write) ë™ì‘     
+        1) WriteReg : Partial Sumì„ Register Fileì— ì €ì¥í•  ë•Œ ì£¼ì†Œê°’ 
+        2) MultValue : Partial Sumì„ Register Fileì— ì €ì¥í•  ë•Œ ì €ì¥í•  ê°’
+        3) Start : Start = 1ì¼ ë•Œë§Œ Register Fileì— ë°ì´í„° ì €ì¥
     
-    2.  Register File ÀĞ±â (Read) µ¿ÀÛ
-        1) ReadReg1, ReadReg2, ReadReg3 : Register File¿¡¼­ µ¥ÀÌÅÍ¸¦ ÀĞ¾î¿Ã ¶§ ÁÖ¼Ò°ª (µ¿½Ã¿¡ 3°³ µ¥ÀÌÅÍ¸¦ ÀĞ¾î¿È)
-        2) ReadData1, ReadData2, ReadData3 : Register File¿¡¼­ µ¥ÀÌÅÍ¸¦ ÀĞ¾î¿Ã ¶§ µ¥ÀÌÅÍÀÇ °ª (µ¿½Ã¿¡ 3°³ µ¥ÀÌÅÍ¸¦ ÀĞ¾î¿È)
-        3) ReadEn : ReadEn = 1ÀÏ ¶§¸¸ µ¥ÀÌÅÍ¸¦ ÀĞ¾î¿È
+    2.  Register File ì½ê¸° (Read) ë™ì‘
+        1) ReadReg1, ReadReg2, ReadReg3 : Register Fileì—ì„œ ë°ì´í„°ë¥¼ ì½ì–´ì˜¬ ë•Œ ì£¼ì†Œê°’ (ë™ì‹œì— 3ê°œ ë°ì´í„°ë¥¼ ì½ì–´ì˜´)
+        2) ReadData1, ReadData2, ReadData3 : Register Fileì—ì„œ ë°ì´í„°ë¥¼ ì½ì–´ì˜¬ ë•Œ ë°ì´í„°ì˜ ê°’ (ë™ì‹œì— 3ê°œ ë°ì´í„°ë¥¼ ì½ì–´ì˜´)
+        3) ReadEn : ReadEn = 1ì¼ ë•Œë§Œ ë°ì´í„°ë¥¼ ì½ì–´ì˜´
 
-    3.  Register FileÀÇ ½ºÆå
+    3.  Register Fileì˜ ìŠ¤í™
         1) Number of address bits = 4
         2) Number of words = 15
         3) Number of bits in a word = 8
@@ -59,7 +61,7 @@ clk, rst_n, Start, Image, Filter, ReadEn, ConvResult
         .ReadEn(ReadEn), .ReadReg1(ReadReg1), .ReadReg2(ReadReg2), .ReadReg3(ReadReg3),
         .ReadData1(ReadData1), .ReadData2(ReadData2), .ReadData3(ReadData3));
     
-    // µ¡¼À °è»ê, Ãâ·Â bit¼ö À¯ÀÇ
+    // ë§ì…ˆ ê³„ì‚°, ì¶œë ¥ bitìˆ˜ ìœ ì˜
     // ConvResult = ReadData1 + ReadData2 + ReadData3
     ADDER ADDER(.clk(clk), .rst_n(rst_n), .data1(ReadData1), .data2(ReadData2), .data3(ReadData3), .out(ConvResult));
     
